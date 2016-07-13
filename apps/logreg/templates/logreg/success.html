@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        {% load staticfiles %}
+	    <link rel="stylesheet" type="text/css" href="{% static 'logreg/style.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    </head>
+    <body>
+        <h1>Success!</h1>
+        <a href="{% url 'logout' %}">Logout</a>
+    </body>
+</html>

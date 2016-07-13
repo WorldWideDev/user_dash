@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        {% load staticfiles %}
+	    <link rel="stylesheet" type="text/css" href="{% static 'logreg/style.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    </head>
+    <body>
+        <div id='container'>
+                <h1>Login.</h1>
+                <form action="{% url 'login' %}" method="POST">{% csrf_token %}
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <div class="control-group error">
+                                <label class="control-label">{{ field.label }}</label> 
+                                <div class="controls">{{ field }}
+                                    <br><span class="help-inline">
+                                        {% for error in  field.errors %}{{ error }}{% endfor %}
+                                    </span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="control-group">
+                                <label class="control-label">{{ field.label }}</label> 
+                                <div class="controls">{{ field }}
+                                    {% if field.help_text %}
+                                        <p class="help-inline"><small>{{ field.help_text }}</small></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" >Submit</button>
+                    </div>
+                </form>
+            </div>
+    </body>
+</html>
