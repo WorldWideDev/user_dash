@@ -9,7 +9,10 @@ class Register(View):
     form = RegisterForm
     template_url = 'logreg/register.html'
     def get(self, request):
-        context = {'form': self.form}
+        context = {
+            'form': self.form,
+            'template_url': self.template_url
+        }
         return render(request, self.template_url, context)
     def post(self, request):
         form = self.form(request.POST)
@@ -24,7 +27,10 @@ class Login(View):
     form = forms.AuthenticationForm
     template_url = 'logreg/login.html'
     def get(self, request):
-        context = {'form': self.form}
+        context = {
+            'form': self.form,
+            'template_url': self.template_url
+        }
         return render(request, self.template_url, context)
     def post(self, request):
         form = self.form(None, request.POST)
@@ -51,3 +57,10 @@ class Success(View):
     template_url = 'logreg/success.html'
     def get(self, request):
         return render(request, self.template_url)
+
+class Dash(View):
+    template_url = 'logreg/dashboard-admin.html'
+    users = User.objects.all()
+    def get(self, request):
+        context = {'users': self.users}
+        return render(request, self.template_url, context)

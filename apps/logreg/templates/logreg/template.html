@@ -9,7 +9,7 @@
         <script type="text/javascript" src="{% static 'jquery.js' %}"></script>
     </head>
     <body>
-        <!-- Fixed navbar -->
+         <!-- Fixed navbar -->
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
@@ -29,34 +29,5 @@
                 </div><!--/.nav-collapse -->
             </div>
         </nav>
-        <div id='container'>
-            <h1>Register.</h1>
-            <form action="{% url 'register' %}" method="POST">{% csrf_token %}
-                {% for field in form %}
-                    {% if field.errors %}
-                        <div class="control-group error">
-                            <label class="control-label">{{ field.label }}</label> 
-                            <div class="controls">{{ field }}
-                                <br><span class="help-inline">
-                                    {% for error in  field.errors %}{{ error }}{% endfor %}
-                                </span>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="control-group">
-                            <label class="control-label">{{ field.label }}</label> 
-                            <div class="controls">{{ field }}
-                                {% if field.help_text %}
-                                    <p class="help-inline"><small>{{ field.help_text }}</small></p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" >Submit</button>
-                </div>
-            </form>
-        </div>
     </body>
 </html>
