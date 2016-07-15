@@ -1,5 +1,5 @@
 *{
-    font-family: monospace;
+    /*font-family: monospace;*/
 }
 #container{
     padding: 20px;
@@ -11,6 +11,9 @@
 }
     #container h1{
         font-size: 3em;
+    }
+    .navbar{
+        margin-bottom: 30px;
     }
 #reg-form{
     display: inline-block;
