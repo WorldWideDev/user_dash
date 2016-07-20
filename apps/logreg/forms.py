@@ -13,7 +13,7 @@ class UserForm(UserCreationForm):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
     def save(self, commit=True):
-        user = super(RegisterForm, self).save(commit=False)
+        user = super(UserForm, self).save(commit=False)
         user.username = self.cleaned_data['username']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
@@ -28,18 +28,35 @@ class CustForm(ModelForm):
     class Meta:
         model = CustomUser
         fields = ('desc',)
-    def save(self, commit=True):
-        cust = super(RegisterCustForm, self).save(commit=False)
-        cust.desc = self.cleaned_data['desc']
-        if commit:
-            cust.save()
-            return cust
+    # def save(self, commit=True):
+    #     cust = super(CustForm, self).save(commit=False)
+    #     cust.desc = self.cleaned_data['desc']
+    #     if commit:
+    #         cust.save()
+    #         return cust
 
 class RegisterForm(MultiModelForm):
     form_classes = {
         'user': UserForm,
         'cust': CustForm
     }
+    # def dispatch_init_instance(self, name, instance):
+    #     if name == 'person':
+    #         return instance
+    #     return super(RegisterForm, self).dispatch_init_instance(name, instance)
+    # def save(self, commit=True):
+    #     print 'in form save'
+    #     objects = super(RegisterForm, self).save(commit=False)
+    #     print objects
+    #     if commit:
+    #         user = objects['user']
+    #         print user
+    #         user.save()
+    #         cust = objects['cust']
+    #         cust.user = user
+    #         print cust
+    #         cust.save()
+    #     return objects
 
 class UpdateProfileForm(UserChangeForm):
     class Meta:

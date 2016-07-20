@@ -1,27 +1,38 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import forms, login, authenticate, logout
-from django.views.generic import View
-from .models import User
+from django.views.generic import View, CreateView
+from django.core.urlresolvers import reverse_lazy
+from .models import User, CustomUser
 from .forms import RegisterForm, UpdateProfileForm
 
 # Create your views here.
-class Register(View):
+class Register(CreateView):
     form = RegisterForm
+    form_class = RegisterForm
     template_url = 'logreg/register.html'
+    template_name = 'logreg/register.html'
+    success_url = reverse_lazy('dashboard')
     def get(self, request):
         context = {
             'form': self.form,
             'template_url': self.template_url
         }
         return render(request, self.template_url, context)
-    def post(self, request):
-        form = self.form(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/dashboard')
-        else:
-            context = {'form': form}
-            return render(request, self.template_url, context)
+    def form_valid(self, form):
+        user = form['user'].save()
+        cust = form['cust'].save(commit=False)
+        cust.user = user
+        cust.save()
+        print cust.desc
+        return redirect('/dashboard')
+    # def post(self, request):
+    #     form = self.form(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         return redirect('/dashboard')
+    #     else:
+    #         context = {'form': form}
+    #         return render(request, self.template_url, context)
 
 class Login(View):
     form = forms.AuthenticationForm
