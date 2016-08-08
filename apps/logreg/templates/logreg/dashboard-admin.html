@@ -30,10 +30,9 @@
             </div>
         </nav>
         <div id="container">
-            <table class="table table-bordered">
+            <table class="table table-bordered dash">
                 <thead>
                     <tr>
-                        <th>Username</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Join Date</th>
@@ -44,8 +43,7 @@
                 <tbody>
                     {% for user in users%}
                         <tr>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td><a href="{% url 'show' user.id %}">{{ user.first_name }} {{ user.last_name }}</a></td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.date_joined }}</td>
                             {% if user.is_staff == True %}

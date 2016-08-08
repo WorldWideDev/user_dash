@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        {% load staticfiles %}
+	    <link rel="stylesheet" type="text/css" href="{% static 'logreg/style.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    </head>
+    <body>
+        <!-- Fixed navbar -->
+       <nav class="navbar navbar-default navbar-fixed-top">
+           <div class="container">
+               <div class="navbar-header">
+                   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                   <span class="sr-only">Toggle navigation</span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                   </button>
+                   <a class="navbar-brand" href="#">Project name</a>
+               </div>
+               <div id="navbar" class="navbar-collapse collapse">
+                   <ul class="nav navbar-nav navbar-right">
+                       <li class="{% if template_url == 'logreg/login.html'%}active{% endif %}"><a href="{% url 'login' %}">Log In</a></li>
+                       <li class="{% if template_url == 'logreg/register.html'%}active{% endif %}"><a href="{% url 'register' %}">Register</a></li>
+                   </ul>
+               </div><!--/.nav-collapse -->
+           </div>
+       </nav>
+        <div class="container show">
+            <h1>SUP {{user.first_name}}</h1>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </body>
+</html>

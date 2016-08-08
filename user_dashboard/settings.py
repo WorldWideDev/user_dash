@@ -124,3 +124,6 @@ USE_TZ = True
 LOGIN_URL = '/login'
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'logreg.CustomUser'
+AUTHENTICATION_BACKENDS = ['apps.logreg.backends.EmailAuthBackend', ]

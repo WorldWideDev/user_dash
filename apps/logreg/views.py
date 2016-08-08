@@ -1,41 +1,14 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import forms, login, authenticate, logout
-from django.views.generic import View, CreateView
+from django.contrib.auth import forms, login as django_login, authenticate, logout as django_logout
+#from .backends import EmailAuthBackend
 from django.core.urlresolvers import reverse_lazy
-from .models import User, CustomUser
-from .forms import RegisterForm, UpdateProfileForm
+from django.views.generic import CreateView, View, UpdateView
+from .models import CustomUser
+from .forms import CustomUserCreationForm, CustomUserChangeForm, AuthenticationForm
 
 # Create your views here.
-class Register(CreateView):
-    form = RegisterForm
-    form_class = RegisterForm
-    template_url = 'logreg/register.html'
-    template_name = 'logreg/register.html'
-    success_url = reverse_lazy('dashboard')
-    def get(self, request):
-        context = {
-            'form': self.form,
-            'template_url': self.template_url
-        }
-        return render(request, self.template_url, context)
-    def form_valid(self, form):
-        user = form['user'].save()
-        cust = form['cust'].save(commit=False)
-        cust.user = user
-        cust.save()
-        print cust.desc
-        return redirect('/dashboard')
-    # def post(self, request):
-    #     form = self.form(request.POST)
-    #     if form.is_valid():
-    #         form.save()
-    #         return redirect('/dashboard')
-    #     else:
-    #         context = {'form': form}
-    #         return render(request, self.template_url, context)
-
 class Login(View):
-    form = forms.AuthenticationForm
+    form = AuthenticationForm
     template_url = 'logreg/login.html'
     def get(self, request):
         context = {
@@ -43,68 +16,96 @@ class Login(View):
             'template_url': self.template_url
         }
         return render(request, self.template_url, context)
+
     def post(self, request):
-        form = self.form(None, request.POST)
+        form = self.form(data=request.POST)
         context = {'form': form}
         if form.is_valid():
-            username = form.cleaned_data['username']
+            print 'in valid'
+            email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
+            user = authenticate(email=email, password=password)
             print user
-            
+
             if user is not None:
                 if user.id == 1:
                     user.is_staff = True
                     user.is_superuser = True
                     user.save()
-                login(request, user)
+                django_login(request, user)
                 request.session['userId'] = user.id
                 return redirect('/dashboard')
             else:
                 return render(request, self.template_url, context)
         else:
+            print 'not valid'
             return render(request, self.template_url, context)
 
 class Logout(View):
     def get(self, request):
-        logout(request)
-        del request.session['user']
-        return redirect('/login')
+        django_logout(request)
+        return redirect('login')
 
-
-class Success(View):
-    template_url = 'logreg/success.html'
+class Register(CreateView):
+    form = CustomUserCreationForm
+    form_class = CustomUserCreationForm
+    template_name = 'logreg/register.html'
     def get(self, request):
-        return render(request, self.template_url)
+        context = {
+            'form': self.form,
+            'template_name': self.template_name
+        }
+        return render(request, self.template_name, context)
+    def post(self, request):
+        form = self.form(request.POST)
+        #print form.errors.as_data()
+        if form.is_valid():
+            user = form.save()
+            return redirect('/login')
+        else:
+            context = {
+                'form': form,
+                'template_name': self.template_name
+            }
+            print form.errors.as_data()
+            return render(request, self.template_name, context)
+
+class Edit(UpdateView):
+    template_name = 'logreg/edit.html'
+    form = CustomUserChangeForm
+    form_class = CustomUserChangeForm
+    model = CustomUser
+    success_url = '/dashboard'
+    def get(self, request, pk):
+        user = CustomUser.objects.get(pk=pk)
+        data = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name
+        }
+        form = self.form(initial=data)
+        print user
+        context = {
+            'user': user,
+            'form': form
+        }
+        return render(request, self.template_name, context)
+
+class Show(View):
+    template_url = 'logreg/show.html'
+    def get(self, request, pk):
+        user = CustomUser.objects.get(pk=pk)
+        return render(request, self.template_url, {'user':user})
 
 class Dash(View):
-    users = User.objects.all()
+    users = CustomUser.objects.all()
     template_url = ''
     def get(self, request):
         _id = request.session['userId']
-        _user = User.objects.get(id = _id)
+        _user = CustomUser.objects.get(id = _id)
         if _user.is_staff == True:
             self.template_url = 'logreg/dashboard-admin.html'
         else:
             self.template_url = 'logreg/dashboard.html'
         context = {'users': self.users}
         return render(request, self.template_url, context)
-
-class Edit(View):
-    template_url = 'logreg/edit.html'
-    form = UpdateProfileForm
-    def get(self, request, id):
-        user = User.objects.get(id = id)
-        context = {
-            'user': user,
-            'form': self.form
-        }
-        return render(request, self.template_url, context)
-    def post(self, request, id):
-        form = self.form(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/dashboard')
-        else:
-            context = {'form': form}
-            return render(request, self.template_url, context)
