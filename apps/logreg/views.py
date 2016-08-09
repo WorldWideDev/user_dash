@@ -3,7 +3,7 @@ from django.contrib.auth import forms, login as django_login, authenticate, logo
 #from .backends import EmailAuthBackend
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import CreateView, View, UpdateView
-from .models import CustomUser
+from .models import CustomUser, Message, Comment
 from .forms import CustomUserCreationForm, CustomUserChangeForm, AuthenticationForm
 
 # Create your views here.
@@ -81,7 +81,8 @@ class Edit(UpdateView):
         data = {
             'email': user.email,
             'first_name': user.first_name,
-            'last_name': user.last_name
+            'last_name': user.last_name,
+            'desc': user.desc
         }
         form = self.form(initial=data)
         print user
@@ -91,21 +92,53 @@ class Edit(UpdateView):
         }
         return render(request, self.template_name, context)
 
+class Delete(View):
+    def post(self, request):
+        CustomUser.objects.filter(pk=request.POST['userId']).delete()
+        return redirect('dashboard')
+
 class Show(View):
     template_url = 'logreg/show.html'
     def get(self, request, pk):
         user = CustomUser.objects.get(pk=pk)
-        return render(request, self.template_url, {'user':user})
+        messages = Message.objects.filter(recipient=user)
+        comments = Comment.objects.filter(page_owner=user)
+        context = {
+            'user':user,
+            'messages': messages,
+            'comments': comments
+        }
+        return render(request, self.template_url, context)
 
 class Dash(View):
-    users = CustomUser.objects.all()
     template_url = ''
     def get(self, request):
+        users = CustomUser.objects.all()
         _id = request.session['userId']
         _user = CustomUser.objects.get(id = _id)
         if _user.is_staff == True:
             self.template_url = 'logreg/dashboard-admin.html'
         else:
             self.template_url = 'logreg/dashboard.html'
-        context = {'users': self.users}
+        context = {'users': users}
         return render(request, self.template_url, context)
+
+class CreateMessage(View):
+    def post(self, request, pk):
+        Message.objects.create(
+                content=request.POST['content'],
+                sender = CustomUser.objects.get(pk=request.session['userId']),
+                recipient = CustomUser.objects.get(pk=pk)
+            )
+        return redirect('dashboard')
+
+class CreateComment(View):
+    def post(self, request, pk):
+        print request.POST['message_id'], 'is message id'
+        Comment.objects.create(
+                content=request.POST['content'],
+                sender = CustomUser.objects.get(pk=request.session['userId']),
+                message = Message.objects.get(pk=request.POST['message_id']),
+                page_owner = CustomUser.objects.get(pk=pk)
+            )
+        return redirect('dashboard')

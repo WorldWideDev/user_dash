@@ -6,6 +6,8 @@
         {% load staticfiles %}
 	    <link rel="stylesheet" type="text/css" href="{% static 'logreg/style.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
+        <script   src="https://code.jquery.com/jquery-2.2.4.js"   integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="   crossorigin="anonymous"></script>
+        <script type="text/javascript" src='{% static "bootstrap\js\bootstrap.min.js" %}'></script>
     </head>
     <body>
          <!-- Fixed navbar -->
@@ -51,11 +53,35 @@
                             {% else %}
                                 <td>Normal</td>
                             {% endif %}
-                            <td><a href="{% url 'edit' user.id %}">Edit</a> | <a href="">Delete</a></td>
+                            <td><a href="{% url 'edit' user.id %}">Edit</a> | <a data-toggle="modal" data-target=".delete-conf-modal" href="#myModal" class="_modal_" id={{user.id}}>Delete</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+            <div id='myModal' class="modal fade delete-conf-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p>Are you sure you want to delete this user?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            <form id='modalForm' action="{% url 'delete' %}" method="post">{% csrf_token %}
+                                <button class="btn btn-danger" type="submit" name="button">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $('._modal_').click(function(){
+                        $('#modalForm').append("<input type='hidden' name='userId' value=" + $(this).attr('id') + ">")
+                    })
+                    $('#myModal').on('hidden.bs.modal', function (e) {
+                        $("#modalForm").children('input').remove()
+                    })
+                })
+            </script>
     </body>
 </html>

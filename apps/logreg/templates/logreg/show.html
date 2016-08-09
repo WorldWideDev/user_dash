@@ -29,7 +29,30 @@
            </div>
        </nav>
         <div class="container show">
-            <h1>SUP {{user.first_name}}</h1>
+            <h1>{{user.first_name}} {{user.last_name}}</h1>
+            <h3>Registered at: {{user.date_joined}}</h3>
+            <h3>Email address: {{user.email}}</h3>
+            <h3>Description: {{user.desc}}</h3>
+
+            <h1>Leave a message for {{user.first_name}}</h1>
+            <form class="" action="{% url 'create_message' user.id %}" method="POST">{% csrf_token %}
+                <textarea name="content" rows="8" cols="40"></textarea><br>
+                <button type="submit" class='btn btn-primary' name="button">Post</button>
+            </form>
+            <h1>Message Board</h1>
+            {% for message in messages %}
+                <p class='message_name'>{{message.sender.first_name}} {{message.sender.last_name}} wrote:</p> <p class="message_date">{{message.created_at}}</p>
+                <p class='message_content'>{{message.content}}</p>
+                <form action="{% url 'create_comment' user.id %}" method="post">{% csrf_token %}
+                    <textarea name="content" placeholder="Leave a comment" rows="3" cols="40"></textarea><br>
+                    <input type="hidden" name="message_id" value="{{message.id}}">
+                    <button type="submit" class='btn btn-primary' name="button">Post</button>
+                </form>
+                {% for comment in comments %}
+                    <p class='message_name'>{{comment.sender.first_name}} {{comment.sender.last_name}} wrote:</p> <p class="message_date">{{comment.created_at}}</p>
+                    <p class='message_content'>{{comment.content}}</p>
+                {% endfor %}
+            {% endfor %}
             <a href="{% url 'logout' %}">Logout</a>
         </div>
     </body>

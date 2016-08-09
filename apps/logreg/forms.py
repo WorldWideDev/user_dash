@@ -18,7 +18,11 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ["email", "first_name", "last_name", "desc"]
         widgets = {
-            'desc': Textarea(attrs={'cols': 80, 'rows': 20}),
+            'desc': Textarea(attrs={
+                'cols': 22,
+                'rows': 5,
+                'placeholder': 'Tell us about yourself!'
+            }),
         }
 
 class CustomUserChangeForm(UserChangeForm):
@@ -39,7 +43,11 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ["email", "first_name", "last_name", "desc"]
         widgets = {
-            'desc': Textarea(attrs={'cols': 22, 'rows': 5}),
+            'desc': Textarea(attrs={
+                'cols': 22,
+                'rows': 5,
+                'placeholder': 'Tell us about yourself!'
+            }),
         }
         exclude = ("password",)
 

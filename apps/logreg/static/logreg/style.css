@@ -26,3 +26,17 @@
 .show{
     padding-top: 40px;
 }
+    .message_name{
+        display: inline-block;
+    }
+    .message_date{
+        display: inline-block;
+        margin-left: 100px;
+    }
+    .message_content{
+        border: solid 1px;
+        width: 50%;
+    }
+.modal-footer > form{
+    display: inline-block;
+}

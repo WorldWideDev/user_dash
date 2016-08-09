@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail
+from datetime import datetime
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
@@ -32,7 +33,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         return self._create_user(email, password, True, True,
                                  **extra_fields)
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
     A fully featured User model with admin-compliant permissions that uses
     a full-length email field as the username.
@@ -42,7 +43,7 @@ class CustomUser(AbstractBaseUser):
     email = models.EmailField(_('email address'), max_length=254, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    desc = models.CharField(max_length=140, blank=True)
+    desc = models.CharField(_('Description'), max_length=140, blank=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
@@ -80,5 +81,32 @@ class CustomUser(AbstractBaseUser):
         """
         send_mail(subject, message, from_email, [self.email])
 
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+
+    def has_module_perms(self, app_label):
+        return self.is_superuser
+
     def __unicode__(self):
         return self.email
+
+class Message(models.Model):
+    content = models.CharField(max_length=250)
+    created_at = models.DateTimeField(default=datetime.now())
+    sender = models.ForeignKey(CustomUser, related_name='user_sender')
+    recipient = models.ForeignKey(CustomUser, related_name='user_recipient')
+    def __str__(self):
+        return self.sender.first_name
+    class Meta:
+        db_table = 'messages'
+
+class Comment(models.Model):
+    content = models.CharField(max_length=250)
+    created_at = models.DateTimeField(default=datetime.now())
+    sender = models.ForeignKey(CustomUser, related_name='user_comment_sender')
+    page_owner = models.ForeignKey(CustomUser, related_name='user_owner')
+    message = models.ForeignKey(Message)
+    def __str__(self):
+        return self.sender.first_name
+    class Meta:
+        db_table = 'comments'
